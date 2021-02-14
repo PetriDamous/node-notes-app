@@ -1,3 +1,5 @@
+const chalk = require('chalk');
+
 // List of commands
 const commands = ['add', 'remove', 'read', 'update', 'list'];
 
@@ -12,8 +14,12 @@ const commandValid = (array, command) => {
 // Checks for empty string
 const isEmptyStr = str => str.trim().length === 0 ? true : false;
 
+// Colors status text in console
+const statusClr = (text, status) => status === 'success' ? chalk.green.inverse(text) : chalk.red.inverse(text); 
+
 module.exports = {
     commands: commands,
     commandValid: commandValid,
-    isEmptyStr: isEmptyStr  
+    isEmptyStr: isEmptyStr,
+    statusClr: statusClr  
 };

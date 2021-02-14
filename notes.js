@@ -1,7 +1,5 @@
 const fs = require("fs");
-const { isEmptyStr } = require('./utilis.js');
-const chalk = require('chalk');
-const { array } = require("yargs");
+const { isEmptyStr, statusClr } = require('./utilis.js');
 
 const fetchNotes = () => {
     try {
@@ -21,11 +19,15 @@ const noteExists = (notes, argv) => notes.some(note => note.title === argv.title
 const addNote = argv => {
     const notes = fetchNotes();
 
-    if (noteExists(notes, argv)) return console.log('Note already exists');
-
     const { title, body } = argv;
 
-    if (isEmptyStr(title)) return console.log('Title cannot be empty');
+    if (isEmptyStr(title)) {
+        return console.log(statusClr('Title cannot be empty', 'danger'));
+    }
+
+    if (noteExists(notes, argv)) {
+        return console.log(statusClr('Note already exists', 'danger'));
+    } 
 
     notes.push({
         title: title,
@@ -34,27 +36,43 @@ const addNote = argv => {
 
     saveNote(notes);
 
-    console.log('Note added');
+    console.log(statusClr('Note added', 'success'));
 };
 
 const removeNote = argv => {
     const notes = fetchNotes();
 
-    if (!noteExists(notes, argv)) return console.log('No such note');
+    const { title } = argv;
 
-    const filteredNotes = notes.filter(elm => elm.title !== argv.title); 
+    if (isEmptyStr(title)) {
+        return console.log(statusClr('Title cannot be empty', 'danger'));
+    } 
+
+    if (!noteExists(notes, argv)) {
+        return console.log(statusClr('No such note', 'danger'));
+    }    
+
+    const filteredNotes = notes.filter(elm => elm.title !== title); 
 
     saveNote(filteredNotes);
 
-    console.log('Note removed.');  
+    console.log(statusClr('Note removed.', 'success'));  
 };
 
 const readNote = argv => {
     const notes = fetchNotes();
 
-    if (!noteExists(notes, argv)) return console.log('No such note');
+    const { title } = argv;
 
-    const filteredNote = notes.filter(elm => elm.title === argv.title)[0]; 
+    if (isEmptyStr(title)) {
+        return console.log(statusClr('Title cannot be empty', 'danger'));
+    } 
+
+    if (!noteExists(notes, argv)) {
+        return console.log(statusClr('No such note', 'danger'));
+    }    
+
+    const filteredNote = notes.filter(elm => elm.title === title)[0]; 
 
     console.log(filteredNote.body);
 };
@@ -62,23 +80,27 @@ const readNote = argv => {
 const updateNote = argv => {
     const notes = fetchNotes();
 
-    if (!noteExists(notes, argv)) return console.log('No such note');
-
     const {title, update_title, update_body} = argv;
 
-    if (isEmptyStr(update_title)) return console.log('Title cannot be empty');
+    if (isEmptyStr(title)) {
+        return console.log(statusClr('Title cannot be empty', 'danger'));
+    } 
+
+    if (!noteExists(notes, argv)) {
+        return console.log(statusClr('No such note', 'danger'));
+    } 
 
     newNotes = notes.reduce((acc, curr) => {
         
         if (curr.title === title) {
             if (update_title) {
                 curr.title = update_title;
-                console.log('Title updated');
+                console.log(statusClr('Title updated', 'success'));
             }
 
             if (update_body) {
                 curr.body = update_body;
-                console.log('Content updated');
+                console.log(statusClr('Content updated', 'success'));
             }
         }
 
@@ -89,7 +111,7 @@ const updateNote = argv => {
     
     saveNote(newNotes);
 
-    console.log('Note Saved');
+    console.log(statusClr('Note Saved', 'success'));
 };
 
 const listNotes = () => {
