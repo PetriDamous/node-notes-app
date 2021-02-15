@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { isEmptyStr, statusClr } = require('./utilis.js');
+const { isEmptyStr, statusClr, highLite } = require('./utilis.js');
 
 const fetchNotes = () => {
     try {
@@ -13,7 +13,7 @@ const fetchNotes = () => {
 
 const saveNote = note => fs.writeFileSync('notes.json', JSON.stringify(note));
 
-const noteExists = (notes, argv) => notes.some(note => note.title === argv.title);
+const noteExists = (notes, argv) => notes.find(note => note.title === argv.title);
 
 
 const addNote = argv => {
@@ -72,8 +72,9 @@ const readNote = argv => {
         return console.log(statusClr('No such note', 'danger'));
     }    
 
-    const filteredNote = notes.filter(elm => elm.title === title)[0]; 
+    const filteredNote = notes.find(elm => elm.title === title); 
 
+    console.log(highLite(`${filteredNote.title}: `));
     console.log(filteredNote.body);
 };
 
@@ -117,7 +118,12 @@ const updateNote = argv => {
 const listNotes = () => {
     const notes = fetchNotes();
 
-    notes.forEach(elm => console.log(elm.title));
+    console.log(highLite('Here are your notes: '));
+
+    notes.forEach(elm => {
+        
+        console.log(elm.title)
+    });
 };
 
 module.exports = {
